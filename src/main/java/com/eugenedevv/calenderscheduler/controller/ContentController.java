@@ -2,6 +2,8 @@ package com.eugenedevv.calenderscheduler.controller;
 
 import com.eugenedevv.calenderscheduler.model.Content;
 import com.eugenedevv.calenderscheduler.repository.ContentCollectionRepository;
+import com.eugenedevv.calenderscheduler.repository.ContentRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,12 +13,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/content")
-@CrossOrigin()
+@CrossOrigin
 public class ContentController {
 
-    private final ContentCollectionRepository repository;
+    private final ContentRepository repository;
 
-    public ContentController(ContentCollectionRepository repository) {
+    public ContentController(ContentRepository repository) {
         this.repository = repository;
     }
 
@@ -33,7 +35,7 @@ public class ContentController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
-    public void create(@RequestBody Content content){
+    public void create(@Valid @RequestBody Content content){
          repository.save(content);
     }
 
@@ -49,6 +51,15 @@ public class ContentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id){
-        repository.delete(id);
+        repository.deleteById(id);
+    }
+
+    @GetMapping("/filter/title/{keyword}")
+    public List<Content> findByTitle(@PathVariable String keyword){
+        return repository.findAllByTitleContains(keyword);
+    }
+    @GetMapping("/filter/status/{status}")
+    public List<Content> findByStatus(@PathVariable String status){
+        return repository.listByStatus(status);
     }
 }
